@@ -55,6 +55,7 @@ env.yml
 .terraform
 .terraform.*
 terraform.tfstate
+terraform.tfstate.*
 hashicorp
 
 # Dependency
