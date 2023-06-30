@@ -50,3 +50,16 @@ env.yml
 
 # Jetbrains IDEs
 .idea
+
+# Terrform
+.terraform
+.terraform.*
+terraform.tfstate
+hashicorp
+
+# Dependency
+nodejs
+
+# Zip file
+*.zip
+

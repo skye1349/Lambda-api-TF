@@ -1,3 +1,9 @@
+// dependicies zip
+data "archive_file" "layer_zip" {
+  type        = "zip"
+  source_file = "layer.zip"
+  output_path = "layer.zip"
+}
 // zip files
 data "archive_file" "create_note_lambda_zip" {
   type        = "zip"
@@ -9,6 +15,13 @@ data "archive_file" "get_note_lambda_zip" {
   type        = "zip"
   source_file = "get.js"
   output_path = "get_note_lambda.zip"
+}
+//layer
+resource "aws_lambda_layer_version" "lambda_layer" {
+  layer_name          = "my_layer"
+  filename            = data.archive_file.layer_zip.output_path
+  source_code_hash    = filebase64sha256(data.archive_file.layer_zip.output_path)
+  compatible_runtimes = ["nodejs14.x"]
 }
 // create iam role for lambda & attachment
 resource "aws_iam_role" "iam_for_lambda" {
@@ -44,6 +57,7 @@ resource "aws_api_gateway_rest_api" "MyDemoAPI" {
 resource "aws_lambda_function" "create_note" {
   filename      = "create_note_lambda.zip"
   function_name = "create_note"
+  layers        = [aws_lambda_layer_version.lambda_layer.arn]
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "create.handler"
   runtime       = "nodejs14.x"
@@ -53,6 +67,7 @@ resource "aws_lambda_function" "create_note" {
 resource "aws_lambda_function" "get_note" {
   filename      = "get_note_lambda.zip"
   function_name = "get_note"
+  layers        = [aws_lambda_layer_version.lambda_layer.arn]
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "get.handler"
   runtime       = "nodejs14.x"
